@@ -1,0 +1,211 @@
+import random
+suits = ('Hearts', 'Diamonds', 'Spades', 'Clubs')
+ranks = ('Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Jack', 'Queen', 'King', 'Ace')
+values = {'Two':2, 'Three':3, 'Four':4, 'Five':5, 'Six':6, 'Seven':7, 'Eight':8, 'Nine':9, 'Ten':10, 'Jack':10,
+         'Queen':10, 'King':10, 'Ace':11}
+playing = True
+
+class Card:
+    def __init__(self, suit, rank):
+        self.suit = suit
+        self.rank = rank
+    def __str__(self):
+        return  self.suit +" " + self.rank
+
+c = Card("Heats", "Two")
+##print C
+
+class Deck:
+    def __init__(self):
+        self.deck = []
+        for suit in suits:
+            for rank in ranks:
+                self.deck.append((suit, rank))
+    def __str__(self):
+        return str(self.deck)
+    def shuffle(self):
+        random.shuffle(self.deck)
+    def deal(self):
+        return self.deck.pop()
+        return out
+    def __len__(self):
+        return len(self.deck)
+D = Deck()        
+##D.shuffle()
+##suit, rank = D.deal()
+##c= Card(suit, rank)
+##print c
+##print D
+##print len(D)
+
+class Hand:
+    def __init__(self):
+        self.cards = []
+        self.value = 0
+        self.aces = 0
+    def __str__(self):
+        cards = []
+        for c in self.cards:
+            suit = c.suit
+            rank = c.rank
+            cards.append((suit,rank))
+        return str(cards)
+    def add_card(self, card):
+        self.cards.append(card)
+        self.value += values[card.rank]
+    def adjust_for_ace(self):
+        if self.value > 21:
+            self.value -= 10
+h = Hand()
+##h.add_card(c)
+##h.add_card(c)
+##d = h.cards[1]
+##print ("this is " + str(c))
+
+class Chips:
+    def __init__(self):
+        self.total = 100
+#        self.bet = bet
+    def win_bet(self, bet):
+        self.total += bet
+    def lose_bet(self, bet):
+        self.total -= bet
+        
+#ask for player's bet       
+def take_bet():
+    while True:
+        try:
+            bet = input("how many chip you bet?")
+            break
+        except:
+            continue
+    print("Your bet is " + str(bet))
+    return bet
+##print (take_bet())
+
+#take hit: add one card to Hand
+def hit(deck, hand):
+    suit, rank = deck.deal()
+    c = Card(suit, rank)
+    hand.add_card(c)
+    if c.rank == 'Ace':
+        hand.adjust_for_ace()
+    
+#Prompt hit or stand
+def hit_or_stand(deck,hand):
+    global playing
+    choose = raw_input("Do you want to hit or stand?")
+    print ("You agreed to " + choose)
+    if choose.lower() == "hit":
+        hit(deck, hand)
+    else:
+        playing = False
+##hit_or_stand(D,h)
+#show cards
+def show_some(player, dealer):
+    print("player's cards are "+ str(player))
+    c = dealer.cards[1]
+    print("dealer's second cards is "+ str(c))
+
+def show_all(player, dealer):
+    print("player's cards are "+ str(player) + " and the total is " + str(player.value))
+    print("dealer's cards are "+ str(dealer) + " and the total is " + str(dealer.value))
+
+#end of game scenarios
+def player_busts(player_c,dealer_c, bet):
+    dealer_c.win_bet(bet)
+    player_c.lose_bet(bet)
+    print("Dealer win")
+    c = player_c.total
+    print("player chips are " + str(c))
+    d = dealer_c.total
+    print("dealer chips are " + str(d))
+
+
+def dealer_busts(player_c,dealer_c, bet):
+    player_c.win_bet(bet)
+    dealer_c.lose_bet(bet)
+    print("Player win")
+    c = player_c.total
+    print("player chips are " + str(c))
+    d = dealer_c.total
+    print("dealer chips are " + str(d))
+   
+    
+def push(player_c,dealer_c):
+    print("Draw")
+    c = player_c.total
+    print("player chips are " + str(c))
+    d = dealer_c.total
+    print("dealer chips are " + str(d))
+
+#main code
+while True:
+    print("Welcome to 21 dot")
+##    D = Deck()        
+##    D.shuffle()
+##    player = Hand()
+##    dealer = Hand()
+##    for i in range(1,3):
+##        suit, rank = D.deal()
+##        p= Card(suit, rank)
+##        player.add_card(p)
+##        suit, rank = D.deal()
+##        d= Card(suit, rank)
+##        dealer.add_card(d)
+    player_c = Chips()
+    dealer_c = Chips()
+#take bet
+    bet = take_bet()
+#show cards
+##    show_some(player, dealer)
+    while playing:
+        D = Deck()        
+        D.shuffle()
+        player = Hand()
+        dealer = Hand()
+        for i in range(1,3):
+            suit, rank = D.deal()
+            p= Card(suit, rank)
+            player.add_card(p)
+            suit, rank = D.deal()
+            d= Card(suit, rank)
+            dealer.add_card(d)
+        show_some(player, dealer)
+    #prompt for player to hit or stand
+        hit_or_stand(D, player)
+        show_some(player, dealer)
+        # If player>21
+        if player.value > 21:
+            player_busts(player_c, dealer_c, bet)
+            play = raw_input("Do you want to replay?")
+            if play.lower() == "no":
+                playing = False
+        else:
+            while dealer.value < 17:
+                suit, rank = D.deal()
+                d= Card(suit, rank)
+                dealer.add_card(d)
+            show_all(player, dealer)
+            if dealer.value > 21:
+                dealer_busts(player_c, dealer_c, bet)
+            else:
+                if dealer.value > player.value:
+                    player_busts(player_c, dealer_c, bet)
+                elif dealer.value < player.value:
+                    dealer_busts(player_c, dealer_c, bet)
+                else:
+                    push(player_c, dealer_c)
+#Replay?
+            play = raw_input("Do you want to replay?")
+            if play.lower() == "no":
+                playing = False
+##            else:
+##                playing = True
+    break
+
+
+##print(dealer.cards)
+##print(player)
+##print(dealer.value)
+##print(player.value)
